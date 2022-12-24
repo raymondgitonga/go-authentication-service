@@ -18,7 +18,13 @@ func main() {
 
 	logger := log.New(os.Stdout, os.Getenv("APP_NAME"), 5)
 
-	appConfig, err := NewAppConfigs(os.Getenv("BASE_URL"), logger)
+	appConfig, err := NewAppConfigs(
+		os.Getenv("DB_CONNECTION_URL"),
+		os.Getenv("DB_NAME"),
+		os.Getenv("BASE_URL"),
+		logger,
+	)
+
 	if err != nil {
 		appConfig.logger.Println(err)
 		return
