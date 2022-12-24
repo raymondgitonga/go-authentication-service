@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"github.com/raymondgitonga/go-authentication/internal/core/dormain"
 	"github.com/raymondgitonga/go-authentication/internal/core/repository"
 	"github.com/raymondgitonga/go-authentication/internal/core/service/jwt"
 	"github.com/raymondgitonga/go-authentication/internal/core/service/user"
@@ -30,9 +29,10 @@ func (h *Handler) HealthCheck(w http.ResponseWriter, _ *http.Request) {
 
 func (h *Handler) Authorize(w http.ResponseWriter, r *http.Request) {
 	key, secret, _ := r.BasicAuth()
-	authRequest := dormain.AuthRequest{Key: key, Secret: secret}
+	repo := repository.NewUserRepository(h.DB)
+	service := jwt.NewAuthorizationService(repo)
 
-	token, err := jwt.NewAuthorization(authRequest).Authorize()
+	token, err := service.Authorize(key, secret)
 	if err != nil {
 		_, err = w.Write([]byte(err.Error()))
 		if err != nil {
@@ -50,9 +50,11 @@ func (h *Handler) Authorize(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) Validate(w http.ResponseWriter, r *http.Request) {
 	token := r.Header.Get("Authorization")
-	authRequest := dormain.AuthRequest{Token: token}
 
-	err := jwt.NewAuthorization(authRequest).Validate()
+	repo := repository.NewUserRepository(h.DB)
+	service := jwt.NewAuthorizationService(repo)
+
+	err := service.Validate(token)
 	if err != nil {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusUnauthorized)

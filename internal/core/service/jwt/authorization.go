@@ -3,45 +3,48 @@ package jwt
 import (
 	"fmt"
 	"github.com/golang-jwt/jwt"
-	"github.com/raymondgitonga/go-authentication/internal/core/dormain"
 	"strings"
 	"time"
 )
 
-var key = []byte("")
+var encryptionKey = []byte("")
 
 const ISSUER = "go-authentication"
 
-type Authorization struct {
-	authRequest dormain.AuthRequest
+type RepositoryUser interface {
+	GetUser(name string) (string, error)
+}
+
+type AuthorizationService struct {
+	repo RepositoryUser
 }
 
 type UserClaim struct {
 	claims jwt.StandardClaims
 }
 
-func NewAuthorization(authRequest dormain.AuthRequest) *Authorization {
-	return &Authorization{authRequest: authRequest}
+func NewAuthorizationService(repo RepositoryUser) *AuthorizationService {
+	return &AuthorizationService{repo: repo}
 }
 
-func (a *Authorization) Authorize() (string, error) {
+func (a *AuthorizationService) Authorize(key, secret string) (string, error) {
 	userClaims := UserClaim{claims: jwt.StandardClaims{
 		IssuedAt:  time.Now().Unix(),
 		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
-		Id:        a.authRequest.Key,
-		Subject:   a.authRequest.Secret,
+		Id:        key,
+		Subject:   secret,
 		Issuer:    ISSUER,
 	}}
 
-	tokenString, err := generateToken(userClaims.claims, key)
+	tokenString, err := generateToken(userClaims.claims, encryptionKey)
 	if err != nil {
 		return "", nil
 	}
 	return tokenString, nil
 }
 
-func (a *Authorization) Validate() error {
-	signedToken := strings.Split(a.authRequest.Token, " ")[1]
+func (a *AuthorizationService) Validate(token string) error {
+	signedToken := strings.Split(token, " ")[1]
 	return parseToken(signedToken)
 }
 
@@ -50,7 +53,7 @@ func parseToken(signedToken string) error {
 		if t.Method.Alg() != jwt.SigningMethodHS256.Alg() {
 			return nil, fmt.Errorf("error in Validate wrong signing algo used")
 		}
-		return key, nil
+		return encryptionKey, nil
 	})
 
 	if err != nil {

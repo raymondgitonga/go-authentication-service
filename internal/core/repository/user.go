@@ -25,3 +25,16 @@ func (r *UserRepository) AddUser(name string, secret []byte) error {
 	}
 	return nil
 }
+
+func (r *UserRepository) GetUser(name string) (string, error) {
+	var secret string
+	query := `SELECT secret from service_user WHERE name=$1;`
+
+	row := r.db.QueryRow(query, name)
+
+	err := row.Scan(&secret)
+	if err != nil {
+		return "", fmt.Errorf("error retriving value %w", err)
+	}
+	return secret, nil
+}
