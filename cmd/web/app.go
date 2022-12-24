@@ -24,5 +24,7 @@ func (c *AppConfigs) StartApp() (*mux.Router, error) {
 	handler := httpserver.Handler{}
 
 	r.HandleFunc(fmt.Sprintf("%s/health-check", c.baseURL), handler.HealthCheck)
+	r.HandleFunc(fmt.Sprintf("%s/authorize", c.baseURL), handler.Authorize)
+	r.HandleFunc(fmt.Sprintf("%s/validate", c.baseURL), handler.Validate)
 	return r, nil
 }

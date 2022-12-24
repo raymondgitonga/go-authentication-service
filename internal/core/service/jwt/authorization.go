@@ -4,13 +4,20 @@ import (
 	"fmt"
 	"github.com/golang-jwt/jwt"
 	"github.com/raymondgitonga/go-authentication/internal/core/dormain"
+	"strings"
 	"time"
 )
 
-var secret = []byte("")
+var key = []byte("")
+
+const ISSUER = "go-authentication"
 
 type Authorization struct {
 	authRequest dormain.AuthRequest
+}
+
+type UserClaim struct {
+	claims jwt.StandardClaims
 }
 
 func NewAuthorization(authRequest dormain.AuthRequest) *Authorization {
@@ -18,36 +25,43 @@ func NewAuthorization(authRequest dormain.AuthRequest) *Authorization {
 }
 
 func (a *Authorization) Authorize() (string, error) {
-	claims := jwt.StandardClaims{
+	userClaims := UserClaim{claims: jwt.StandardClaims{
 		IssuedAt:  time.Now().Unix(),
 		ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
-		Subject:   a.authRequest.Email,
-	}
+		Id:        a.authRequest.Key,
+		Subject:   a.authRequest.Secret,
+		Issuer:    ISSUER,
+	}}
 
-	tokenString, err := generateToken(claims, secret)
+	tokenString, err := generateToken(userClaims.claims, key)
 	if err != nil {
 		return "", nil
 	}
 	return tokenString, nil
 }
 
-func parseToken(signedToken string) (*jwt.StandardClaims, error) {
+func (a *Authorization) Validate() error {
+	signedToken := strings.Split(a.authRequest.Token, " ")[1]
+	return parseToken(signedToken)
+}
+
+func parseToken(signedToken string) error {
 	token, err := jwt.ParseWithClaims(signedToken, &jwt.StandardClaims{}, func(t *jwt.Token) (interface{}, error) {
 		if t.Method.Alg() != jwt.SigningMethodHS256.Alg() {
 			return nil, fmt.Errorf("error in Validate wrong signing algo used")
 		}
-		return secret, nil
+		return key, nil
 	})
 
 	if err != nil {
-		return nil, fmt.Errorf("error in Validate, error parsing token: %w", err)
+		return fmt.Errorf("error in Validate, error parsing token: %w", err)
 	}
 
 	if !token.Valid {
-		return nil, fmt.Errorf("error in Validate: token not valid")
+		return fmt.Errorf("error in Validate: token not valid")
 	}
 
-	return token.Claims.(*jwt.StandardClaims), nil
+	return nil
 }
 
 func generateToken(claims jwt.StandardClaims, secret []byte) (string, error) {

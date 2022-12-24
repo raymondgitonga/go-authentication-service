@@ -42,6 +42,6 @@ func main() {
 
 	err = server.ListenAndServe()
 	if err != nil {
-		appConfig.logger.Println("error starting server: %s", err)
+		appConfig.logger.Printf("error starting server: %s", err)
 	}
 }

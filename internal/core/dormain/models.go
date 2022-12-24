@@ -1,5 +1,7 @@
 package dormain
 
 type AuthRequest struct {
-	Email string `json:"email,validate:required,email"`
+	Key    string `json:"key,omitempty"`
+	Secret string `json:"secret,omitempty"`
+	Token  string `json:"token,omitempty"`
 }
