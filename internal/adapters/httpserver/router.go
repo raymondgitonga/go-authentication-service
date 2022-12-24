@@ -31,6 +31,7 @@ func (h *Handler) HealthCheck(w http.ResponseWriter, _ *http.Request) {
 
 func (h *Handler) Authorize(w http.ResponseWriter, r *http.Request) {
 	key, secret, _ := r.BasicAuth()
+
 	repo := repository.NewUserRepository(h.DB)
 	service := jwt.NewAuthorizationService(repo)
 

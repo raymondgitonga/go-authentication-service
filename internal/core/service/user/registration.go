@@ -9,7 +9,6 @@ import (
 
 type Repository interface {
 	AddUser(name string, secret []byte) error
-	GetUser(name string) (string, error)
 }
 
 type RegistrationService struct {

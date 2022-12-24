@@ -12,16 +12,16 @@ var encryptionKey = []byte("")
 
 const ISSUER = "go-authentication"
 
+type UserClaim struct {
+	claims jwt.StandardClaims
+}
+
 type RepositoryUser interface {
 	GetUser(name string) (string, error)
 }
 
 type AuthorizationService struct {
 	repo RepositoryUser
-}
-
-type UserClaim struct {
-	claims jwt.StandardClaims
 }
 
 func NewAuthorizationService(repo RepositoryUser) *AuthorizationService {
