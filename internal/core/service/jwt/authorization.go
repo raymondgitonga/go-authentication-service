@@ -3,6 +3,7 @@ package jwt
 import (
 	"fmt"
 	"github.com/golang-jwt/jwt"
+	"golang.org/x/crypto/bcrypt"
 	"strings"
 	"time"
 )
@@ -35,6 +36,16 @@ func (a *AuthorizationService) Authorize(key, secret string) (string, error) {
 		Subject:   secret,
 		Issuer:    ISSUER,
 	}}
+
+	encryptedSecret, err := a.repo.GetUser(key)
+	if err != nil {
+		return "", nil
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(encryptedSecret), []byte(secret))
+	if err != nil {
+		return "", nil
+	}
 
 	tokenString, err := generateToken(userClaims.claims, encryptionKey)
 	if err != nil {
