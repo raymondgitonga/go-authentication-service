@@ -39,17 +39,17 @@ func (a *AuthorizationService) Authorize(key, secret string) (string, error) {
 
 	encryptedSecret, err := a.repo.GetUser(key)
 	if err != nil {
-		return "", nil
+		return "", err
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(encryptedSecret), []byte(secret))
 	if err != nil {
-		return "", nil
+		return "", err
 	}
 
 	tokenString, err := generateToken(userClaims.claims, encryptionKey)
 	if err != nil {
-		return "", nil
+		return "", err
 	}
 	return tokenString, nil
 }

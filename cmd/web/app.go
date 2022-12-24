@@ -42,7 +42,8 @@ func (c *AppConfigs) StartApp() (*mux.Router, error) {
 		return nil, fmt.Errorf("error running migration: %w", err)
 	}
 
-	handler := httpserver.Handler{DB: dbClient}
+	handler := httpserver.Handler{DB: dbClient, Logger: c.logger}
+
 	r.HandleFunc(fmt.Sprintf("%s/health-check", c.baseURL), handler.HealthCheck)
 	r.HandleFunc(fmt.Sprintf("%s/authorize", c.baseURL), handler.Authorize)
 	r.HandleFunc(fmt.Sprintf("%s/validate", c.baseURL), handler.Validate)

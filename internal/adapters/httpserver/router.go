@@ -7,11 +7,13 @@ import (
 	"github.com/raymondgitonga/go-authentication/internal/core/repository"
 	"github.com/raymondgitonga/go-authentication/internal/core/service/jwt"
 	"github.com/raymondgitonga/go-authentication/internal/core/service/user"
+	"log"
 	"net/http"
 )
 
 type Handler struct {
-	DB *sql.DB
+	DB     *sql.DB
+	Logger *log.Logger
 }
 
 func (h *Handler) HealthCheck(w http.ResponseWriter, _ *http.Request) {
@@ -34,6 +36,7 @@ func (h *Handler) Authorize(w http.ResponseWriter, r *http.Request) {
 
 	token, err := service.Authorize(key, secret)
 	if err != nil {
+		h.Logger.Println("error at Authorize, token generation failed %s", err)
 		_, err = w.Write([]byte(err.Error()))
 		if err != nil {
 			fmt.Printf("error writing httpserver response: %s", err)
