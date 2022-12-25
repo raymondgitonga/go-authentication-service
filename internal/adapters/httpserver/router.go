@@ -45,6 +45,7 @@ func (h *Handler) Authorize(w http.ResponseWriter, r *http.Request) {
 	token, err := service.Authorize(key, secret)
 	if err != nil {
 		h.logger.Error("error at Authorize, token generation failed", zap.String("error", err.Error()))
+		w.WriteHeader(http.StatusBadRequest)
 		_, err = w.Write([]byte(err.Error()))
 		if err != nil {
 			h.logger.Error("error writing httpserver response", zap.String("error", err.Error()))

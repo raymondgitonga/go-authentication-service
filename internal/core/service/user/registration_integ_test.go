@@ -18,7 +18,7 @@ func TestRegistrationService_RegisterUser(t *testing.T) {
 	assert.NoError(t, err)
 
 	t.Run("successfully add user", func(t *testing.T) {
-		repo := &mocks.RepositoryMock{AddUserFunc: func(name string, secret []byte) error {
+		repo := &user_mocks.RepositoryMock{AddUserFunc: func(name string, secret []byte) error {
 			return nil
 		}}
 
@@ -31,7 +31,7 @@ func TestRegistrationService_RegisterUser(t *testing.T) {
 	})
 
 	t.Run("failed to add user", func(t *testing.T) {
-		repo := &mocks.RepositoryMock{AddUserFunc: func(name string, secret []byte) error {
+		repo := &user_mocks.RepositoryMock{AddUserFunc: func(name string, secret []byte) error {
 			return fmt.Errorf("error adding user")
 		}}
 
