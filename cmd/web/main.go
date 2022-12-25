@@ -32,9 +32,11 @@ func main() {
 	}
 
 	config, err := NewAppConfigs(
+		os.Getenv("BASE_URL"),
 		os.Getenv("DB_CONNECTION_URL"),
 		os.Getenv("DB_NAME"),
-		os.Getenv("BASE_URL"),
+		os.Getenv("REDIS_ADDR"),
+		os.Getenv("REDIS_PASS"),
 		logger,
 	)
 

@@ -1,11 +1,14 @@
 package httpserver
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"github.com/go-redis/redis/v9"
 	"github.com/raymondgitonga/go-authentication/internal/core/repository"
 	"github.com/raymondgitonga/go-authentication/internal/core/service/jwt"
+	token_manager "github.com/raymondgitonga/go-authentication/internal/core/service/token"
 	"github.com/raymondgitonga/go-authentication/internal/core/service/user"
 	"go.uber.org/zap"
 	"net/http"
@@ -13,12 +16,14 @@ import (
 
 type Handler struct {
 	db     *sql.DB
+	redis  *redis.Client
 	logger *zap.Logger
 }
 
-func NewHandler(db *sql.DB, logger *zap.Logger) *Handler {
+func NewHandler(db *sql.DB, redis *redis.Client, logger *zap.Logger) *Handler {
 	return &Handler{
 		db:     db,
+		redis:  redis,
 		logger: logger,
 	}
 }
@@ -118,5 +123,22 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 	_, err = w.Write(resp)
 	if err != nil {
 		h.logger.Error("error writing httpserver response", zap.String("error", err.Error()))
+	}
+}
+
+func (h *Handler) RotateTokens(w http.ResponseWriter, _ *http.Request) {
+	repo := repository.NewTokenRepository(h.redis, h.logger)
+	tokenService := token_manager.NewTokenService(repo, h.logger)
+	go tokenService.RotateEncryptionTokens(context.Background())
+
+	response, err := json.Marshal("success")
+	if err != nil {
+		fmt.Printf("error writing marshalling response: %s", err)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	_, err = w.Write(response)
+	if err != nil {
+		fmt.Printf("error writing httpserver response: %s", err)
 	}
 }
