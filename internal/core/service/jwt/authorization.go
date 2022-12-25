@@ -3,6 +3,7 @@ package jwt
 import (
 	"fmt"
 	"github.com/golang-jwt/jwt"
+	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
 	"strings"
 	"time"
@@ -21,11 +22,12 @@ type RepositoryUser interface {
 }
 
 type AuthorizationService struct {
-	repo RepositoryUser
+	repo   RepositoryUser
+	logger *zap.Logger
 }
 
-func NewAuthorizationService(repo RepositoryUser) *AuthorizationService {
-	return &AuthorizationService{repo: repo}
+func NewAuthorizationService(repo RepositoryUser, logger *zap.Logger) *AuthorizationService {
+	return &AuthorizationService{repo: repo, logger: logger}
 }
 
 func (a *AuthorizationService) Authorize(key, secret string) (string, error) {
@@ -47,7 +49,7 @@ func (a *AuthorizationService) Authorize(key, secret string) (string, error) {
 		return "", err
 	}
 
-	tokenString, err := generateToken(userClaims.claims, encryptionKey)
+	tokenString, err := a.generateToken(userClaims.claims, encryptionKey)
 	if err != nil {
 		return "", err
 	}
@@ -56,10 +58,10 @@ func (a *AuthorizationService) Authorize(key, secret string) (string, error) {
 
 func (a *AuthorizationService) Validate(token string) error {
 	signedToken := strings.Split(token, " ")[1]
-	return parseToken(signedToken)
+	return a.parseToken(signedToken)
 }
 
-func parseToken(signedToken string) error {
+func (a *AuthorizationService) parseToken(signedToken string) error {
 	token, err := jwt.ParseWithClaims(signedToken, &jwt.StandardClaims{}, func(t *jwt.Token) (interface{}, error) {
 		if t.Method.Alg() != jwt.SigningMethodHS256.Alg() {
 			return nil, fmt.Errorf("error in Validate wrong signing algo used")
@@ -68,22 +70,25 @@ func parseToken(signedToken string) error {
 	})
 
 	if err != nil {
-		return fmt.Errorf("error in Validate, error parsing token: %w", err)
+		a.logger.Error("error in parseToken, error parsing token", zap.String("error", err.Error()))
+		return fmt.Errorf("error parsing token")
 	}
 
 	if !token.Valid {
-		return fmt.Errorf("error in Validate: token not valid")
+		a.logger.Error("error in parseToken, invalid token", zap.String("error", err.Error()))
+		return fmt.Errorf("token not valid")
 	}
 
 	return nil
 }
 
-func generateToken(claims jwt.StandardClaims, secret []byte) (string, error) {
+func (a *AuthorizationService) generateToken(claims jwt.StandardClaims, secret []byte) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	signedToken, err := token.SignedString(secret)
 	if err != nil {
-		return "", fmt.Errorf("error in generateToken, could not generate signed token: %w", err)
+		a.logger.Error("error in generateToken, could not generate signed token", zap.String("error", err.Error()))
+		return "", fmt.Errorf("could not generate signed token")
 	}
 
 	return signedToken, nil

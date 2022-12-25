@@ -6,17 +6,17 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/raymondgitonga/go-authentication/internal/adapters/db"
 	"github.com/raymondgitonga/go-authentication/internal/adapters/httpserver"
-	"log"
+	"go.uber.org/zap"
 )
 
 type AppConfigs struct {
 	baseURL string
 	dbURL   string
 	dbName  string
-	logger  *log.Logger
+	logger  *zap.Logger
 }
 
-func NewAppConfigs(dbURL, dbName, baseURL string, logger *log.Logger) (*AppConfigs, error) {
+func NewAppConfigs(dbURL, dbName, baseURL string, logger *zap.Logger) (*AppConfigs, error) {
 	if len(baseURL) < 1 {
 		return nil, fmt.Errorf("error in NewAppConfigs, incorrect baseURl")
 	}
@@ -42,7 +42,7 @@ func (c *AppConfigs) StartApp() (*mux.Router, error) {
 		return nil, fmt.Errorf("error running migration: %w", err)
 	}
 
-	handler := httpserver.Handler{DB: dbClient, Logger: c.logger}
+	handler := httpserver.NewHandler(dbClient, c.logger)
 
 	r.HandleFunc(fmt.Sprintf("%s/health-check", c.baseURL), handler.HealthCheck)
 	r.HandleFunc(fmt.Sprintf("%s/authorize", c.baseURL), handler.Authorize)

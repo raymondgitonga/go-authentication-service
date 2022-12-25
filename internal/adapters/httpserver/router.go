@@ -7,13 +7,20 @@ import (
 	"github.com/raymondgitonga/go-authentication/internal/core/repository"
 	"github.com/raymondgitonga/go-authentication/internal/core/service/jwt"
 	"github.com/raymondgitonga/go-authentication/internal/core/service/user"
-	"log"
+	"go.uber.org/zap"
 	"net/http"
 )
 
 type Handler struct {
-	DB     *sql.DB
-	Logger *log.Logger
+	db     *sql.DB
+	logger *zap.Logger
+}
+
+func NewHandler(db *sql.DB, logger *zap.Logger) *Handler {
+	return &Handler{
+		db:     db,
+		logger: logger,
+	}
 }
 
 func (h *Handler) HealthCheck(w http.ResponseWriter, _ *http.Request) {
@@ -32,15 +39,15 @@ func (h *Handler) HealthCheck(w http.ResponseWriter, _ *http.Request) {
 func (h *Handler) Authorize(w http.ResponseWriter, r *http.Request) {
 	key, secret, _ := r.BasicAuth()
 
-	repo := repository.NewUserRepository(h.DB)
-	service := jwt.NewAuthorizationService(repo)
+	repo := repository.NewUserRepository(h.db, h.logger)
+	service := jwt.NewAuthorizationService(repo, h.logger)
 
 	token, err := service.Authorize(key, secret)
 	if err != nil {
-		h.Logger.Println("error at Authorize, token generation failed %s", err)
+		h.logger.Error("error at Authorize, token generation failed", zap.String("error", err.Error()))
 		_, err = w.Write([]byte(err.Error()))
 		if err != nil {
-			fmt.Printf("error writing httpserver response: %s", err)
+			h.logger.Error("error writing httpserver response", zap.String("error", err.Error()))
 		}
 		return
 	}
@@ -48,15 +55,15 @@ func (h *Handler) Authorize(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	_, err = w.Write([]byte(token))
 	if err != nil {
-		fmt.Printf("error writing httpserver response: %s", err)
+		h.logger.Error("error writing httpserver response", zap.String("error", err.Error()))
 	}
 }
 
 func (h *Handler) Validate(w http.ResponseWriter, r *http.Request) {
 	token := r.Header.Get("Authorization")
 
-	repo := repository.NewUserRepository(h.DB)
-	service := jwt.NewAuthorizationService(repo)
+	repo := repository.NewUserRepository(h.db, h.logger)
+	service := jwt.NewAuthorizationService(repo, h.logger)
 
 	err := service.Validate(token)
 	if err != nil {
@@ -64,7 +71,7 @@ func (h *Handler) Validate(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusUnauthorized)
 		_, err = w.Write([]byte("could not authorize"))
 		if err != nil {
-			fmt.Printf("error writing httpserver response: %s", err)
+			h.logger.Error("error writing httpserver response", zap.String("error", err.Error()))
 		}
 		return
 	}
@@ -73,15 +80,15 @@ func (h *Handler) Validate(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	_, err = w.Write([]byte("authorized"))
 	if err != nil {
-		fmt.Printf("error writing httpserver response: %s", err)
+		h.logger.Error("error writing httpserver response", zap.String("error", err.Error()))
 	}
 }
 
 func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 	name := r.URL.Query().Get("name")
 
-	repo := repository.NewUserRepository(h.DB)
-	userService := user.NewRegistrationService(repo)
+	repo := repository.NewUserRepository(h.db, h.logger)
+	userService := user.NewRegistrationService(repo, h.logger)
 
 	authReg, err := userService.RegisterUser(name)
 	if err != nil {
@@ -89,7 +96,7 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		_, err = w.Write([]byte("could not register"))
 		if err != nil {
-			fmt.Printf("error writing httpserver response: %s", err)
+			h.logger.Error("error writing httpserver response", zap.String("error", err.Error()))
 		}
 		return
 	}
@@ -100,7 +107,7 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		_, err = w.Write([]byte("could not register"))
 		if err != nil {
-			fmt.Printf("error marshaling response: %s", err)
+			h.logger.Error("error marshaling response", zap.String("error", err.Error()))
 		}
 		return
 	}
@@ -109,6 +116,6 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	_, err = w.Write(resp)
 	if err != nil {
-		fmt.Printf("error writing httpserver response: %s", err)
+		h.logger.Error("error writing httpserver response", zap.String("error", err.Error()))
 	}
 }

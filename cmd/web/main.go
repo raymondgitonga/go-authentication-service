@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/joho/godotenv"
+	"go.uber.org/zap"
 	"log"
 	"net/http"
 	"os"
@@ -16,9 +17,21 @@ func main() {
 		return
 	}
 
-	logger := log.New(os.Stdout, os.Getenv("APP_NAME"), 5)
+	logger, err := zap.NewProduction()
+	if err != nil {
+		log.Fatalf("error setting up logger: %s", err)
+		return
+	}
+	defer func() {
+		err = logger.Sync()
+	}()
 
-	appConfig, err := NewAppConfigs(
+	if err != nil {
+		log.Fatalf("error setting up logger: %s", err)
+		return
+	}
+
+	config, err := NewAppConfigs(
 		os.Getenv("DB_CONNECTION_URL"),
 		os.Getenv("DB_NAME"),
 		os.Getenv("BASE_URL"),
@@ -26,13 +39,13 @@ func main() {
 	)
 
 	if err != nil {
-		appConfig.logger.Println(err)
+		config.logger.Error("error initialising configs", zap.String("error", err.Error()))
 		return
 	}
 
-	router, err := appConfig.StartApp()
+	router, err := config.StartApp()
 	if err != nil {
-		appConfig.logger.Println(err)
+		config.logger.Error("error starting app", zap.String("error", err.Error()))
 		return
 	}
 
@@ -44,10 +57,10 @@ func main() {
 		Handler:           router,
 	}
 
-	appConfig.logger.Printf("starting server on %s", port)
+	config.logger.Info("app started", zap.String("port", port))
 
 	err = server.ListenAndServe()
 	if err != nil {
-		appConfig.logger.Printf("error starting server: %s", err)
+		config.logger.Error("error starting server", zap.String("error", err.Error()))
 	}
 }

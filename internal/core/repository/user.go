@@ -3,15 +3,18 @@ package repository
 import (
 	"database/sql"
 	"fmt"
+	"go.uber.org/zap"
 )
 
 type UserRepository struct {
-	db *sql.DB
+	db     *sql.DB
+	logger *zap.Logger
 }
 
-func NewUserRepository(db *sql.DB) *UserRepository {
+func NewUserRepository(db *sql.DB, logger *zap.Logger) *UserRepository {
 	return &UserRepository{
-		db: db,
+		db:     db,
+		logger: logger,
 	}
 }
 
@@ -21,7 +24,8 @@ func (r *UserRepository) AddUser(name string, secret []byte) error {
 	_, err := r.db.Exec(query, name, secret)
 
 	if err != nil {
-		return fmt.Errorf("error adding value to db %w", err)
+		r.logger.Error("error at AddUser", zap.String("error", err.Error()))
+		return fmt.Errorf("error adding user")
 	}
 	return nil
 }
@@ -34,7 +38,8 @@ func (r *UserRepository) GetUser(name string) (string, error) {
 
 	err := row.Scan(&secret)
 	if err != nil {
-		return "", fmt.Errorf("error retriving value %w", err)
+		r.logger.Error("error at  GetUser", zap.String("error", err.Error()))
+		return "", fmt.Errorf("error getting user")
 	}
 	return secret, nil
 }
