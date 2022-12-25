@@ -56,6 +56,33 @@ func (r *TokenRepository) GetLatestToken(ctx context.Context) (*redis.Z, error) 
 	return &token[0], nil
 }
 
+func (r *TokenRepository) GetToken(ctx context.Context, tokenID int64) (*redis.Z, error) {
+	result := r.redis.ZRangeByScoreWithScores(ctx, "encryption_keys", &redis.ZRangeBy{
+		Min:    strconv.Itoa(int(tokenID)),
+		Max:    strconv.Itoa(int(tokenID)),
+		Offset: 0,
+		Count:  1,
+	})
+
+	if result.Err() != nil {
+		r.logger.Error("error at GetToken", zap.String("error", result.Err().Error()))
+		return nil, fmt.Errorf("could not save token")
+	}
+
+	token, err := result.Result()
+	if err != nil {
+		r.logger.Info("token not found", zap.String("error", err.Error()))
+		return nil, fmt.Errorf("token not found")
+	}
+
+	if len(token) < 1 {
+		return nil, fmt.Errorf("token not found")
+	}
+
+	fmt.Println(float64(tokenID) == token[0].Score)
+	return &token[0], nil
+}
+
 func (r *TokenRepository) ClearExpiredTokens(ctx context.Context) {
 	end := strconv.Itoa(int(time.Now().Add(-time.Hour * 48).Unix()))
 	result := r.redis.ZRemRangeByScore(ctx, "encryption_keys", "0", end)
