@@ -7,3 +7,9 @@ services:
       - '5432:5432'
     volumes:
       - /postgresql/data
+  redis:
+    image: redis:alpine3.17
+    env_file:
+      - .env
+    ports:
+      - '6379:6379'
