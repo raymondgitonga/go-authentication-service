@@ -25,7 +25,7 @@ func TestGenerateToken(t *testing.T) {
 	}
 
 	key := []byte("")
-	service := NewAuthorizationService(nil, logger)
+	service := NewAuthorizationService(nil, nil, logger)
 	token, err := service.generateToken(claims, key)
 	assert.NoError(t, err)
 	assert.Equal(t, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NzE4OTQxMzEsImp0aSI6ImlkIiwiaWF0IjoxNjcxODA3NzMxLCJpc3MiOiJhdXRoIiwic3ViIjoic3ViamVjdCJ9.nVPXUXj7YMP7C7rQXOhde6S10Te6yRjT7jCWGB5sgUY", token)
@@ -42,7 +42,7 @@ func TestParseToken(t *testing.T) {
 	}()
 	assert.NoError(t, err)
 
-	service := NewAuthorizationService(nil, logger)
+	service := NewAuthorizationService(nil, nil, logger)
 
 	t.Run("valid token", func(t *testing.T) {
 		claims = jwt.StandardClaims{
@@ -57,7 +57,7 @@ func TestParseToken(t *testing.T) {
 		assert.NoError(t, err)
 		assert.NotNil(t, token)
 
-		err = service.parseToken(token)
+		err = service.parseToken(token, []byte(""))
 		assert.NoError(t, err)
 	})
 
@@ -72,7 +72,7 @@ func TestParseToken(t *testing.T) {
 
 		wrongToken := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2NzE5MTM3OTAsImlhdCI6MTY3MTkxMzY3MCwic3ViIjoiZW1pbEBnbWFpbC5jb20ifQ.fDE0KdLE8bU2TxY5cDTkFihtCCRUKPHJDS30UQd-zy0"
 
-		err = service.parseToken(wrongToken)
+		err = service.parseToken(wrongToken, []byte(""))
 		assert.Error(t, err)
 	})
 
@@ -89,7 +89,7 @@ func TestParseToken(t *testing.T) {
 		assert.NoError(t, err)
 		assert.NotNil(t, token)
 
-		err = service.parseToken(token)
+		err = service.parseToken(token, []byte(""))
 		assert.Error(t, err)
 	})
 }

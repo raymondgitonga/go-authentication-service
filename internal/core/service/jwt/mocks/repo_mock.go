@@ -8,22 +8,22 @@ import (
 	"sync"
 )
 
-// Ensure, that RepositoryUserMock does implement RepositoryUser.
+// Ensure, that RepositoryUserMock does implement UserRepository.
 // If this is not the case, regenerate this file with moq.
-var _ jwt.RepositoryUser = &RepositoryUserMock{}
+var _ jwt.UserRepository = &RepositoryUserMock{}
 
-// RepositoryUserMock is a mock implementation of RepositoryUser.
+// RepositoryUserMock is a mock implementation of UserRepository.
 //
 //	func TestSomethingThatUsesRepositoryUser(t *testing.T) {
 //
-//		// make and configure a mocked RepositoryUser
+//		// make and configure a mocked UserRepository
 //		mockedRepositoryUser := &RepositoryUserMock{
 //			GetUserFunc: func(name string) (string, error) {
 //				panic("mock out the GetUser method")
 //			},
 //		}
 //
-//		// use mockedRepositoryUser in code that requires RepositoryUser
+//		// use mockedRepositoryUser in code that requires UserRepository
 //		// and then make assertions.
 //
 //	}
@@ -45,7 +45,7 @@ type RepositoryUserMock struct {
 // GetUser calls GetUserFunc.
 func (mock *RepositoryUserMock) GetUser(name string) (string, error) {
 	if mock.GetUserFunc == nil {
-		panic("RepositoryUserMock.GetUserFunc: method is nil but RepositoryUser.GetUser was just called")
+		panic("RepositoryUserMock.GetUserFunc: method is nil but UserRepository.GetUser was just called")
 	}
 	callInfo := struct {
 		Name string

@@ -14,15 +14,13 @@ import (
 	"time"
 )
 
-//var encryptionKey = []byte("")
-
 const ISSUER = "go-authentication"
 
 type UserClaim struct {
 	claims jwt.StandardClaims
 }
 
-type RepositoryUser interface {
+type UserRepository interface {
 	GetUser(name string) (string, error)
 }
 
@@ -32,12 +30,12 @@ type TokenRepository interface {
 }
 
 type AuthorizationService struct {
-	userRepo  RepositoryUser
+	userRepo  UserRepository
 	tokenRepo TokenRepository
 	logger    *zap.Logger
 }
 
-func NewAuthorizationService(userRepo RepositoryUser, tokenRepo TokenRepository, logger *zap.Logger) *AuthorizationService {
+func NewAuthorizationService(userRepo UserRepository, tokenRepo TokenRepository, logger *zap.Logger) *AuthorizationService {
 	return &AuthorizationService{userRepo: userRepo, tokenRepo: tokenRepo, logger: logger}
 }
 
