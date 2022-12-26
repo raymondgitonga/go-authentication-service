@@ -44,8 +44,9 @@ func (h *Handler) HealthCheck(w http.ResponseWriter, _ *http.Request) {
 func (h *Handler) Authorize(w http.ResponseWriter, r *http.Request) {
 	key, secret, _ := r.BasicAuth()
 
-	repo := repository.NewUserRepository(h.db, h.logger)
-	service := jwt.NewAuthorizationService(repo, h.logger)
+	userRepo := repository.NewUserRepository(h.db, h.logger)
+	tokenRepo := repository.NewTokenRepository(h.redis, h.logger)
+	service := jwt.NewAuthorizationService(userRepo, tokenRepo, h.logger)
 
 	token, err := service.Authorize(key, secret)
 	if err != nil {
@@ -68,8 +69,9 @@ func (h *Handler) Authorize(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) Validate(w http.ResponseWriter, r *http.Request) {
 	token := r.Header.Get("Authorization")
 
-	repo := repository.NewUserRepository(h.db, h.logger)
-	service := jwt.NewAuthorizationService(repo, h.logger)
+	userRepo := repository.NewUserRepository(h.db, h.logger)
+	tokenRepo := repository.NewTokenRepository(h.redis, h.logger)
+	service := jwt.NewAuthorizationService(userRepo, tokenRepo, h.logger)
 
 	err := service.Validate(token)
 	if err != nil {

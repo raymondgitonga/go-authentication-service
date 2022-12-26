@@ -79,7 +79,6 @@ func (r *TokenRepository) GetToken(ctx context.Context, tokenID int64) (*redis.Z
 		return nil, fmt.Errorf("token not found")
 	}
 
-	fmt.Println(float64(tokenID) == token[0].Score)
 	return &token[0], nil
 }
 
