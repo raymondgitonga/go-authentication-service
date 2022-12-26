@@ -21,7 +21,7 @@ func NewRegistrationService(repo Repository, logger *zap.Logger) *RegistrationSe
 	return &RegistrationService{repo: repo, logger: logger}
 }
 
-func (r *RegistrationService) RegisterUser(name string) (*dormain.AuthRequest, error) {
+func (r *RegistrationService) RegisterUser(name string) (*dormain.AuthResponse, error) {
 	secret, err := uuid.NewUUID()
 	if err != nil {
 		r.logger.Error("error in RegisterUser, error generating user secret", zap.String("error", err.Error()))
@@ -40,10 +40,10 @@ func (r *RegistrationService) RegisterUser(name string) (*dormain.AuthRequest, e
 		return nil, fmt.Errorf("error generating user secret")
 	}
 
-	authReq := &dormain.AuthRequest{
+	authResp := &dormain.AuthResponse{
 		Name:   name,
 		Secret: secret.String(),
 	}
 
-	return authReq, nil
+	return authResp, nil
 }

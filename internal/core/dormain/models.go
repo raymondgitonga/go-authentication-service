@@ -1,6 +1,6 @@
 package dormain
 
-type AuthRequest struct {
+type AuthResponse struct {
 	Name   string `json:"name,omitempty"`
 	Key    string `json:"key,omitempty"`
 	Secret string `json:"secret,omitempty"`
