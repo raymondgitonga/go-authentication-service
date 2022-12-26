@@ -7,7 +7,7 @@ A sample go service for authenticating client requests
 2. Postgres
 3. Redis
 4. Docker and docker-compose
-5. Utils
+5. Deps
    *  [github.com/gorilla/mux](https://github.com/gorilla/mux)
    *  [github.com/golang-jwt/jwt](https://github.com/golang-jwt/jwt)
    *  [github.com/golang-migrate/migrate/v4](https://github.com/golang-migrate/migrate)
