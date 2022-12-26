@@ -6,7 +6,7 @@ package jwt_mocks
 import (
 	"context"
 	"github.com/go-redis/redis/v9"
-	"github.com/raymondgitonga/go-authentication/internal/core/service/jwt"
+	"github.com/raymondgitonga/go-authentication-service/internal/core/service/jwt"
 	"sync"
 )
 

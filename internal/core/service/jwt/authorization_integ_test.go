@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 	"github.com/go-redis/redis/v9"
-	"github.com/raymondgitonga/go-authentication/internal/core/service/jwt"
-	"github.com/raymondgitonga/go-authentication/internal/core/service/jwt/mocks"
+	"github.com/raymondgitonga/go-authentication-service/internal/core/service/jwt"
+	"github.com/raymondgitonga/go-authentication-service/internal/core/service/jwt/mocks"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

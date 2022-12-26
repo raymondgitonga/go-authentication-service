@@ -6,10 +6,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/go-redis/redis/v9"
-	"github.com/raymondgitonga/go-authentication/internal/core/repository"
-	"github.com/raymondgitonga/go-authentication/internal/core/service/jwt"
-	token_manager "github.com/raymondgitonga/go-authentication/internal/core/service/token"
-	"github.com/raymondgitonga/go-authentication/internal/core/service/user"
+	"github.com/raymondgitonga/go-authentication-service/internal/core/repository"
+	"github.com/raymondgitonga/go-authentication-service/internal/core/service/jwt"
+	manager "github.com/raymondgitonga/go-authentication-service/internal/core/service/token"
+	"github.com/raymondgitonga/go-authentication-service/internal/core/service/user"
 	"go.uber.org/zap"
 	"net/http"
 )
@@ -130,7 +130,7 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) RotateTokens(w http.ResponseWriter, _ *http.Request) {
 	repo := repository.NewTokenRepository(h.redis, h.logger)
-	tokenService := token_manager.NewTokenService(repo, h.logger)
+	tokenService := manager.NewTokenService(repo, h.logger)
 	go tokenService.RotateEncryptionTokens(context.Background())
 
 	response, err := json.Marshal("success")

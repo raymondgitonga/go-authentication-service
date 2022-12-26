@@ -4,7 +4,7 @@
 package jwt_mocks
 
 import (
-	"github.com/raymondgitonga/go-authentication/internal/core/service/jwt"
+	"github.com/raymondgitonga/go-authentication-service/internal/core/service/jwt"
 	"sync"
 )
 

@@ -22,4 +22,4 @@ docker-compose-up:
 tests:
 	go test -v ./... | { grep -v 'no test files'; true; }
 
-build: docker-compose-up run
+start: docker-compose-up run

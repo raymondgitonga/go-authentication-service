@@ -4,7 +4,7 @@
 package user_mocks
 
 import (
-	"github.com/raymondgitonga/go-authentication/internal/core/service/user"
+	"github.com/raymondgitonga/go-authentication-service/internal/core/service/user"
 	"sync"
 )
 

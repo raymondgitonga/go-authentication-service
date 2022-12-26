@@ -3,7 +3,7 @@ package user
 import (
 	"fmt"
 	"github.com/google/uuid"
-	"github.com/raymondgitonga/go-authentication/internal/core/dormain"
+	"github.com/raymondgitonga/go-authentication-service/internal/core/dormain"
 	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
 )

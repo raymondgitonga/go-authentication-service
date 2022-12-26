@@ -5,7 +5,7 @@ package manager_mocks
 
 import (
 	"context"
-	"github.com/raymondgitonga/go-authentication/internal/core/service/token"
+	"github.com/raymondgitonga/go-authentication-service/internal/core/service/token"
 	"sync"
 )
 

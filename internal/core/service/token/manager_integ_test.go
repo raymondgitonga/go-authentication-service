@@ -3,8 +3,8 @@ package manager_test
 import (
 	"context"
 	"fmt"
-	"github.com/raymondgitonga/go-authentication/internal/core/service/token"
-	"github.com/raymondgitonga/go-authentication/internal/core/service/token/mocks"
+	"github.com/raymondgitonga/go-authentication-service/internal/core/service/token"
+	"github.com/raymondgitonga/go-authentication-service/internal/core/service/token/mocks"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zaptest/observer"

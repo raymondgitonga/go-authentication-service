@@ -2,8 +2,8 @@ package user_test
 
 import (
 	"fmt"
-	"github.com/raymondgitonga/go-authentication/internal/core/service/user"
-	"github.com/raymondgitonga/go-authentication/internal/core/service/user/mocks"
+	"github.com/raymondgitonga/go-authentication-service/internal/core/service/user"
+	"github.com/raymondgitonga/go-authentication-service/internal/core/service/user/mocks"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap"
 	"testing"

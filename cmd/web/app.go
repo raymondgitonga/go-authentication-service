@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/gorilla/mux"
-	"github.com/raymondgitonga/go-authentication/internal/adapters/cache"
-	"github.com/raymondgitonga/go-authentication/internal/adapters/db"
-	"github.com/raymondgitonga/go-authentication/internal/adapters/httpserver"
+	"github.com/raymondgitonga/go-authentication-service/internal/adapters/cache"
+	"github.com/raymondgitonga/go-authentication-service/internal/adapters/db"
+	"github.com/raymondgitonga/go-authentication-service/internal/adapters/httpserver"
 	"go.uber.org/zap"
 )
 
