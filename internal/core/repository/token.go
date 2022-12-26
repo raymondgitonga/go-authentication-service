@@ -28,7 +28,6 @@ func (r *TokenRepository) AddToken(ctx context.Context, encryptionKey string, to
 	})
 
 	if status.Err() != nil {
-		fmt.Println(status)
 		r.logger.Error("error at AddToken, could not save token", zap.String("error", status.Err().Error()))
 		return fmt.Errorf("could not save token")
 	}
@@ -82,18 +81,17 @@ func (r *TokenRepository) GetToken(ctx context.Context, tokenID int64) (*redis.Z
 	return &token[0], nil
 }
 
-func (r *TokenRepository) ClearExpiredTokens(ctx context.Context) {
+func (r *TokenRepository) ClearExpiredTokens(ctx context.Context) error {
 	end := strconv.Itoa(int(time.Now().Add(-time.Hour * 48).Unix()))
 	result := r.redis.ZRemRangeByScore(ctx, "encryption_keys", "0", end)
 
 	if result.Err() != nil {
-		r.logger.Error("error at GetToken", zap.String("error", result.Err().Error()))
-		return
+		return result.Err()
 	}
 
 	_, err := result.Result()
 	if err != nil {
-		r.logger.Info("token not found", zap.String("error", err.Error()))
-		return
+		return err
 	}
+	return nil
 }

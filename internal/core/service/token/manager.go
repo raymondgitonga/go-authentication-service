@@ -1,4 +1,4 @@
-package token_manager
+package manager
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 
 type TokenRepository interface {
 	AddToken(ctx context.Context, encryptionKey string, tokenID int64) error
-	ClearExpiredTokens(ctx context.Context)
+	ClearExpiredTokens(ctx context.Context) error
 }
 
 type TokenService struct {
@@ -35,7 +35,11 @@ func (s *TokenService) RotateEncryptionTokens(ctx context.Context) {
 		return
 	}
 
-	s.repo.ClearExpiredTokens(ctx)
+	err = s.repo.ClearExpiredTokens(ctx)
+	if err != nil {
+		s.logger.Error("error clearing expired tokens", zap.String("error", err.Error()))
+		return
+	}
 
 	s.logger.Info("successfully added token", zap.Int("tokenID", int(tokenID)))
 }
