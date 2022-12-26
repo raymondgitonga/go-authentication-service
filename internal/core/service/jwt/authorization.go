@@ -14,7 +14,7 @@ import (
 	"time"
 )
 
-const ISSUER = "go-authentication"
+const ISSUER = "go-authentication-service"
 
 type UserClaim struct {
 	claims jwt.StandardClaims

@@ -1,4 +1,4 @@
-module github.com/raymondgitonga/go-authentication
+module github.com/raymondgitonga/go-authentication-service
 
 go 1.19
 
