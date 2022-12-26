@@ -52,7 +52,7 @@ This endpoint rotates encryption keys used to generate JWT tokens
 ![](go-auth.jpg)
 
 1. Client service registers with the authentication service, details stored in the database and secret key is granted
-2. Using the secret key a client service requests for an authentication token, generated from am encryption key stored in cache
+2. Using the secret key a client service requests for an authentication token, generated from an encryption key stored in cache
 3. Client service requests for validation of authentication token
 4. Encryption keys rotated through a cron every 24hrs, the cron triggers generation of new key and deletes any keys older than 48 hrs
 
