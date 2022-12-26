@@ -57,7 +57,7 @@ func TestTokenRepository(t *testing.T) {
 }
 
 func setupTestCache(t *testing.T) (*redis.Client, *testcontainers.LocalDockerCompose) {
-	redisContainer := testcontainers.NewLocalDockerCompose([]string{"../../../test_docker_files/redis-compose.yml"},
+	redisContainer := testcontainers.NewLocalDockerCompose([]string{"../../../test_docker_files/docker-compose.yml"},
 		strings.ToLower(uuid.New().String()))
 	redisContainer.WithCommand([]string{"up", "-d"}).Invoke()
 

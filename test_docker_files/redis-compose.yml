@@ -1,7 +1,0 @@
-services:
-  redis-test:
-    image: redis:alpine3.17
-    env_file:
-      - ../.env
-    ports:
-      - '6378:6379'

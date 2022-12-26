@@ -40,7 +40,7 @@ func TestUserRepository(t *testing.T) {
 }
 
 func setupTestDatabase(t *testing.T) (*sql.DB, *testcontainers.LocalDockerCompose) {
-	postgres := testcontainers.NewLocalDockerCompose([]string{"../../../test_docker_files/postgres-compose.yml"},
+	postgres := testcontainers.NewLocalDockerCompose([]string{"../../../test_docker_files/docker-compose.yml"},
 		strings.ToLower(uuid.New().String()))
 	postgres.WithCommand([]string{"up", "-d"}).Invoke()
 	postgresURL := "postgres://postgres:postgres@localhost:9876/postgres?sslmode=disable"
